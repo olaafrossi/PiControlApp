@@ -7,7 +7,6 @@ using System;
 using System.Device.I2c;
 using System.Threading;
 using Iot.Device.Bmxx80;
-using Iot.Device.Bmxx80.FilteringMode;
 using Iot.Device.Bmxx80.PowerMode;
 
 namespace PiControlApp.ConsoleUI
@@ -31,7 +30,7 @@ namespace PiControlApp.ConsoleUI
         }
 
         /// <summary>
-        /// Gets the Pressure- pass in "inches" to get inches of Mercury, otherwise you will get Hectopascals
+        ///     Gets the Pressure- pass in "inches" to get inches of Mercury, otherwise you will get Hectopascals
         /// </summary>
         /// <param name="units"></param>
         /// <returns></returns>
@@ -42,7 +41,7 @@ namespace PiControlApp.ConsoleUI
             _sensor.TryReadPressure(out var preValue);
 
             string output;
-            if (string.Equals(units, "inches", System.StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(units, "inches", StringComparison.OrdinalIgnoreCase))
             {
                 output = $"{preValue.InchesOfMercury} Inches";
             }
@@ -64,7 +63,7 @@ namespace PiControlApp.ConsoleUI
         }
 
         /// <summary>
-        /// Gets the altitude- pass in "feet" to get Feet, otherwise you will get Metric
+        ///     Gets the altitude- pass in "feet" to get Feet, otherwise you will get Metric
         /// </summary>
         /// <param name="units"></param>
         /// <returns></returns>
@@ -75,7 +74,7 @@ namespace PiControlApp.ConsoleUI
             _sensor.TryReadAltitude(out var altValue);
 
             string output;
-            if (string.Equals(units, "feet", System.StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(units, "feet", StringComparison.OrdinalIgnoreCase))
             {
                 output = $"{altValue.Feet:#.##} Feet";
             }
@@ -88,7 +87,7 @@ namespace PiControlApp.ConsoleUI
         }
 
         /// <summary>
-        /// Gets the Temp- pass in "f" to get Fahrenheit otherwise you get Commie units
+        ///     Gets the Temp- pass in "f" to get Fahrenheit otherwise you get Commie units
         /// </summary>
         /// <param name="units"></param>
         /// <returns></returns>
@@ -99,7 +98,7 @@ namespace PiControlApp.ConsoleUI
             _sensor.TryReadTemperature(out var tempValue);
 
             string output;
-            if (string.Equals(units, "f", System.StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(units, "f", StringComparison.OrdinalIgnoreCase))
             {
                 output = $"{tempValue.DegreesFahrenheit} F";
             }
