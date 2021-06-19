@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Created by Three Byte Intermedia, Inc.
+// project: PiControlApp
+// Created: 2021 06 19
+// by Olaaf Rossi
+
 using System.Device.Gpio;
 
 namespace PiControlApp.ConsoleUI
 {
     public class GpioDevice
     {
+        private const int pin = 18;
         private readonly GpioController _controller;
-        const int pin = 18;
 
         public GpioDevice()
         {
@@ -20,7 +20,7 @@ namespace PiControlApp.ConsoleUI
         }
 
         /// <summary>
-        /// Turns on/off the LED connected to Pin 18
+        ///     Turns on/off the LED connected to Pin 18
         /// </summary>
         /// <param name="state"></param>
         public void LedOn(bool state)
