@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -21,41 +22,59 @@ namespace PiControlApp.ConsoleUI
                 .WithAutomaticReconnect()
                 .Build();
             _sensorHub = connection;
-            Task task = StartAsync();
+            Task task = ConnectWithRetryAsync(_sensorHub, CancellationToken.None);
         }
 
-        private async Task StartAsync()
+        private static async Task<bool> ConnectWithRetryAsync(HubConnection connection, CancellationToken token)
         {
+            connection.Reconnecting += error =>
+            {
+                Debug.Assert(connection.State == HubConnectionState.Reconnecting);
+                WriteMessages();
+                Console.WriteLine(connection.State);
+                return Task.CompletedTask;
+            };
+
+            connection.Reconnected += connectionId =>
+            {
+                Debug.Assert(connection.State == HubConnectionState.Connected);
+                WriteMessages();
+                Console.WriteLine(connection.State);
+                return Task.CompletedTask;
+            };
+
             // receive a message from the hub
-            _sensorHub.On<string, string>("ReceiveMessage", (user, message) => OnReceiveMessage(user, message));
-            _sensorHub.On<string, int>("ReceiveInt", (user, i) => OnIntReceive(user, i));
-            Task t = _sensorHub.StartAsync();
+            connection.On<string, string>("ReceiveMessage", OnReceiveMessage);
+            connection.On<string, int>("ReceiveInt", OnIntReceive);
 
-            _sensorHub.Reconnecting += error =>
+            // Keep trying to until we can start or the token is canceled.
+            while (true)
             {
-                Debug.Assert(_sensorHub.State == HubConnectionState.Reconnecting);
-                WriteMessages();
-                Console.WriteLine(_sensorHub.State);
-                return Task.CompletedTask;
-            };
-
-            _sensorHub.Reconnected += connectionId =>
-            {
-                Debug.Assert(_sensorHub.State == HubConnectionState.Connected);
-                WriteMessages();
-                Console.WriteLine(_sensorHub.State);
-                return Task.CompletedTask;
-            };
-
-            t.Wait();
+                try
+                {
+                    await connection.StartAsync(token).ConfigureAwait(false);
+                    Debug.Assert(connection.State == HubConnectionState.Connected);
+                    return true;
+                }
+                catch when (token.IsCancellationRequested)
+                {
+                    return false;
+                }
+                catch
+                {
+                    // Failed to connect, trying again in 5000 ms.
+                    Debug.Assert(connection.State == HubConnectionState.Disconnected);
+                    await Task.Delay(5000).ConfigureAwait(false);
+                }
+            }
         }
 
-        private void OnIntReceive(string user, int i)
+        private static void OnIntReceive(string user, int i)
         {
             Console.WriteLine($"{user}: {i}: {DateTime.Now}");
         }
 
-        private void OnReceiveMessage(string user, string message)
+        private static void OnReceiveMessage(string user, string message)
         {
             Console.WriteLine($"{user}: {message}: {DateTime.Now}");
         }
@@ -70,7 +89,7 @@ namespace PiControlApp.ConsoleUI
             return _sensorHub.InvokeAsync("SendInt", user, msg);
         }
 
-        private void WriteMessages()
+        private static void WriteMessages()
         {
             Console.WriteLine("--------------");
             Console.WriteLine("--------------");
