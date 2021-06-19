@@ -3,9 +3,11 @@
 // Created: 2021 06 18
 // by Olaaf Rossi
 
+using System;
 using System.Device.I2c;
 using System.Threading;
 using Iot.Device.Bmxx80;
+using Iot.Device.Bmxx80.FilteringMode;
 using Iot.Device.Bmxx80.PowerMode;
 
 namespace PiControlApp.ConsoleUI
@@ -21,6 +23,8 @@ namespace PiControlApp.ConsoleUI
             I2cDevice i2cDevice = I2cDevice.Create(i2cSettings);
             Bme280 sensor = new(i2cDevice);
             int measurementTime = sensor.GetMeasurementDuration();
+            Console.WriteLine($"Sensor Measurement time is {measurementTime} ms");
+            Thread.Sleep(500);
 
             _sensor = sensor;
             _measurementTime = measurementTime;
