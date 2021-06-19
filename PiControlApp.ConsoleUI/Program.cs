@@ -42,6 +42,8 @@ namespace PiControlApp.ConsoleUI
                 Console.WriteLine(sensor.ReadHumidity());
                 Console.WriteLine(sensor.ReadAltitude("feet"));
                 Console.WriteLine(sensor.ReadAltitude("meters"));
+                Console.WriteLine(sensor.ReadTemperature("f"));
+                Console.WriteLine(sensor.ReadTemperature("c"));
                 count++;
                 Console.WriteLine($"number of samples {count}");
             }
