@@ -26,6 +26,11 @@ namespace PiControlApp.ConsoleUI
             _measurementTime = measurementTime;
         }
 
+        /// <summary>
+        /// Gets the Pressure- pass in "inches" to get inches of Mercury, otherwise you will get Hectopascals
+        /// </summary>
+        /// <param name="units"></param>
+        /// <returns></returns>
         public string ReadPressure(string units)
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
@@ -54,6 +59,11 @@ namespace PiControlApp.ConsoleUI
             return output;
         }
 
+        /// <summary>
+        /// Gets the altitude- pass in "feet" to get Feet, otherwise you will get Metric
+        /// </summary>
+        /// <param name="units"></param>
+        /// <returns></returns>
         public string ReadAltitude(string units)
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
@@ -73,6 +83,11 @@ namespace PiControlApp.ConsoleUI
             return output;
         }
 
+        /// <summary>
+        /// Gets the Temp- pass in "f" to get Fahrenheit otherwise you get Commie units
+        /// </summary>
+        /// <param name="units"></param>
+        /// <returns></returns>
         public string ReadTemperature(string units)
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
