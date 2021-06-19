@@ -17,9 +17,9 @@ namespace PiControlApp.ConsoleUI
 
         public WeatherSensor()
         {
-            I2cConnectionSettings i2cSettings = new I2cConnectionSettings(1, Bmx280Base.DefaultI2cAddress);
+            I2cConnectionSettings i2cSettings = new(1, Bmx280Base.DefaultI2cAddress);
             I2cDevice i2cDevice = I2cDevice.Create(i2cSettings);
-            Bme280 sensor = new Bme280(i2cDevice);
+            Bme280 sensor = new(i2cDevice);
             int measurementTime = sensor.GetMeasurementDuration();
 
             _sensor = sensor;

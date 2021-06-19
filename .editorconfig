@@ -2,3 +2,6 @@
 
 # IDE0045: Convert to conditional expression
 dotnet_style_prefer_conditional_expression_over_assignment = false
+
+# MA0076: Do not use implicit culture-sensitive ToString in interpolated strings
+dotnet_diagnostic.MA0076.severity = silent
