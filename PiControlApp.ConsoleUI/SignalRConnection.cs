@@ -17,17 +17,24 @@ namespace PiControlApp.ConsoleUI
         {
             string url = "http://192.168.1.138:5000/ChatHub";
 
-            HubConnection connection = new HubConnectionBuilder()
-                .WithUrl(url)
-                .WithAutomaticReconnect()
-                .Build();
-
-            _chatHub = connection;
+            try
+            {
+                HubConnection connection = new HubConnectionBuilder()
+                    .WithUrl(url)
+                    .WithAutomaticReconnect()
+                    .Build();
+                _chatHub = connection;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.WriteLine("No SignalR");
+            }
 
             // receive a message from the hub
-            connection.On<string, string>("ReceiveMessage", (user, message) => OnReceiveMessage(user, message));
-            connection.On<string, int>("IntReceive", (s, i) => OnIntReceive(s, i));
-            Task t = connection.StartAsync();
+            _chatHub.On<string, string>("ReceiveMessage", (user, message) => OnReceiveMessage(user, message));
+            _chatHub.On<string, int>("IntReceive", (s, i) => OnIntReceive(s, i));
+            Task t = _chatHub.StartAsync();
 
             t.Wait();
 
