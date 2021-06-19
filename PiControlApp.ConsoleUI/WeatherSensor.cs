@@ -38,7 +38,7 @@ namespace PiControlApp.ConsoleUI
             _sensor.TryReadPressure(out var preValue);
 
             string output;
-            if (units == "inches")
+            if (string.Equals(units, "inches", System.StringComparison.OrdinalIgnoreCase))
             {
                 output = $"{preValue.InchesOfMercury} Inches";
             }
@@ -71,7 +71,7 @@ namespace PiControlApp.ConsoleUI
             _sensor.TryReadAltitude(out var altValue);
 
             string output;
-            if (units == "feet")
+            if (string.Equals(units, "feet", System.StringComparison.OrdinalIgnoreCase))
             {
                 output = $"{altValue.Feet:#.##} Feet";
             }
@@ -95,7 +95,7 @@ namespace PiControlApp.ConsoleUI
             _sensor.TryReadTemperature(out var tempValue);
 
             string output;
-            if (units == "f")
+            if (string.Equals(units, "f", System.StringComparison.OrdinalIgnoreCase))
             {
                 output = $"{tempValue.DegreesFahrenheit} F";
             }
