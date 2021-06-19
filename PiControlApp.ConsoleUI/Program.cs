@@ -6,6 +6,7 @@
 // https://endjin.com/blog/2019/09/passwordless-ssh-from-windows-10-to-raspberry-pi
 
 using System;
+using System.Text;
 using System.Threading;
 using JetBrains.Annotations;
 
@@ -33,15 +34,38 @@ namespace PiControlApp.ConsoleUI
             while (true)
             {
                 led.LedOn(true);
-                Thread.Sleep(10);
+                Thread.Sleep(1);
                 led.LedOn(false);
-                Console.WriteLine(sensor.ReadPressure("inches"));
-                Console.WriteLine(sensor.ReadPressure("hecto"));
-                Console.WriteLine(sensor.ReadHumidity());
-                Console.WriteLine(sensor.ReadAltitude("feet"));
-                Console.WriteLine(sensor.ReadAltitude("meters"));
-                Console.WriteLine(sensor.ReadTemperature("f"));
-                Console.WriteLine(sensor.ReadTemperature("c"));
+                string pressureImperial = sensor.ReadPressure("inches");
+                string pressureMetric = sensor.ReadPressure("hecto");
+                string humidity = sensor.ReadHumidity();
+                string altitudeImperial = sensor.ReadAltitude("feet");
+                string altitudeMetric = sensor.ReadAltitude("meters");
+                string temperatureImperial = sensor.ReadTemperature("f");
+                string temperatureMetric = sensor.ReadTemperature("c");
+
+                StringBuilder sb = new();
+                sb.Append(pressureImperial);
+                sb.AppendLine();
+                sb.Append(pressureMetric);
+                sb.AppendLine();
+                sb.Append(humidity);
+                sb.AppendLine();
+                sb.Append(altitudeImperial);
+                sb.AppendLine();
+                sb.Append(altitudeMetric);
+                sb.AppendLine();
+                sb.Append(temperatureImperial);
+                sb.AppendLine();
+                sb.Append(temperatureMetric);
+                sb.AppendLine();
+                sb.Append(DateTime.Now.ToString("hh:mm:ss.FFF"));
+                string message = sb.ToString();
+                Console.WriteLine(message);
+
+                signalRConnection.SendMessageAsync("pi01-Data", message);
+
+
                 count++;
                 Console.WriteLine($"number of samples {count}");
 
