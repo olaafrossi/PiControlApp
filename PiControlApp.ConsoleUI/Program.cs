@@ -6,7 +6,6 @@
 // https://endjin.com/blog/2019/09/passwordless-ssh-from-windows-10-to-raspberry-pi
 
 using System;
-using System.Device.Gpio;
 using System.Threading;
 
 namespace PiControlApp.ConsoleUI
@@ -18,6 +17,8 @@ namespace PiControlApp.ConsoleUI
             Console.WriteLine("Hello World!");
 
             WeatherSensor sensor = new();
+            GpioDevice led = new();
+            
             //SignalRConnection signalRConnection = new SignalRConnection();
 
             //signalRConnection.Start();
@@ -25,18 +26,14 @@ namespace PiControlApp.ConsoleUI
             //signalRConnection.SendMessage("pi01", $"{DateTime.Now.Millisecond} initial startup");
 
             Console.WriteLine("Blinking LED. Press Ctrl+C to end.");
-            const int pin = 18;
 
-            using GpioController controller = new();
-            controller.OpenPin(pin, PinMode.Output);
-            bool ledOn = true;
             int count = 1;
 
             while (true)
             {
-                controller.Write(pin, ledOn ? PinValue.High : PinValue.Low);
-                ledOn = !ledOn;
-                Thread.Sleep(1000);
+                led.LedOn(true);
+                Thread.Sleep(10);
+                led.LedOn(false);
                 Console.WriteLine(sensor.ReadPressure("inches"));
                 Console.WriteLine(sensor.ReadPressure("hecto"));
                 Console.WriteLine(sensor.ReadHumidity());
