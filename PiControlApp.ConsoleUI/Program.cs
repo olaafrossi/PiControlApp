@@ -2,8 +2,6 @@
 // project: PiControlApp
 // Created: 2021 06 12
 // by Olaaf Rossi
-// scp -r C:\Dev\PiControlApp\PiControlApp.ConsoleUI\bin\Release\net5.0\publish\* pi@pi01:Desktop/Deployment/
-// https://endjin.com/blog/2019/09/passwordless-ssh-from-windows-10-to-raspberry-pi
 
 using System;
 using System.Text;
@@ -15,6 +13,8 @@ namespace PiControlApp.ConsoleUI
     [UsedImplicitly]
     public class Program
     {
+        // scp -r C:\Dev\PiControlApp\PiControlApp.ConsoleUI\bin\Release\net5.0\publish\* pi@pi01:Desktop/Deployment/
+        // https://endjin.com/blog/2019/09/passwordless-ssh-from-windows-10-to-raspberry-pi
 
         private static void Main(string[] args)
         {
@@ -61,18 +61,18 @@ namespace PiControlApp.ConsoleUI
                 sb.AppendLine();
                 sb.Append(DateTime.Now.ToString("hh:mm:ss.FFF"));
                 string message = sb.ToString();
+
                 Console.WriteLine(message);
-
                 signalRConnection.SendMessageAsync("pi01-Data", message);
-
 
                 count++;
                 Console.WriteLine($"number of samples {count}");
 
-                if (count % 8 is not 0)
+                if (count % 2 is not 0)
                 {
-                    signalRConnection.SendMessageAsync("pi01", $"{count} count % 8 is not 0");
+                    signalRConnection.SendMessageAsync("pi01", $"{count} count % 2 is not 0");
                 }
+
                 if (count % 2 is not 1)
                 {
                     signalRConnection.SendIntAsync("pi01-Counter", count);
