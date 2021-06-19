@@ -44,6 +44,8 @@ namespace PiControlApp.ConsoleUI
                 string temperatureImperial = sensor.ReadTemperature("f");
                 string temperatureMetric = sensor.ReadTemperature("c");
 
+                // TODO create a new method in the WeatherSensor class to get all values
+
                 StringBuilder sb = new();
                 sb.Append(pressureImperial);
                 sb.AppendLine();
