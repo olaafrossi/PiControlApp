@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\.editorconfig" Link="CodeProp\.editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +38,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CodeProp\" />
   </ItemGroup>
 
 </Project>
