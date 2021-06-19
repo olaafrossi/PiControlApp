@@ -4,6 +4,7 @@
 // by Olaaf Rossi
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -11,55 +12,95 @@ namespace PiControlApp.ConsoleUI
 {
     public class SignalRConnection
     {
-        private HubConnection _chatHub;
+        private readonly HubConnection _sensorHub;
 
-        public async void Start()
+        public SignalRConnection(string url)
         {
-            string url = "http://192.168.1.138:5000/ChatHub";
+            HubConnection connection = new HubConnectionBuilder()
+                .WithUrl(url)
+                .WithAutomaticReconnect()
+                .Build();
+            _sensorHub = connection;
+            Task task = StartAsync();
+        }
 
-            try
-            {
-                HubConnection connection = new HubConnectionBuilder()
-                    .WithUrl(url)
-                    .WithAutomaticReconnect()
-                    .Build();
-                _chatHub = connection;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                Console.WriteLine("No SignalR");
-            }
-
+        private async Task StartAsync()
+        {
             // receive a message from the hub
-            _chatHub.On<string, string>("ReceiveMessage", (user, message) => OnReceiveMessage(user, message));
-            _chatHub.On<string, int>("IntReceive", (s, i) => OnIntReceive(s, i));
-            Task t = _chatHub.StartAsync();
+            _sensorHub.On<string, string>("ReceiveMessage", (user, message) => OnReceiveMessage(user, message));
+            _sensorHub.On<string, int>("ReceiveInt", (user, i) => OnIntReceive(user, i));
+            Task t = _sensorHub.StartAsync();
+
+            _sensorHub.Reconnecting += error =>
+            {
+                Debug.Assert(_sensorHub.State == HubConnectionState.Reconnecting);
+                WriteMessages();
+                Console.WriteLine(_sensorHub.State);
+                return Task.CompletedTask;
+            };
+
+            _sensorHub.Reconnected += connectionId =>
+            {
+                Debug.Assert(_sensorHub.State == HubConnectionState.Connected);
+                WriteMessages();
+                Console.WriteLine(_sensorHub.State);
+                return Task.CompletedTask;
+            };
 
             t.Wait();
-
-            // send a message to the hub
-            //await connection.InvokeAsync("SendMessage", user, msg);
         }
 
-        private async void OnIntReceive(string s, int i)
+        private void OnIntReceive(string user, int i)
         {
-            Console.WriteLine($"{s}: {i}");
-        }
-
-        public async void SendMessage(string user, string msg)
-        {
-            await _chatHub.InvokeAsync("SendMessage", user, msg);
-        }
-
-        public async void SendInt(string user, int msg)
-        {
-            await _chatHub.InvokeAsync("SendMessage", user, msg);
+            Console.WriteLine($"{user}: {i}: {DateTime.Now}");
         }
 
         private void OnReceiveMessage(string user, string message)
         {
-            Console.WriteLine($"{user}: {message}");
+            Console.WriteLine($"{user}: {message}: {DateTime.Now}");
+        }
+
+        public Task SendMessageAsync(string user, string msg)
+        {
+            return _sensorHub.InvokeAsync("SendMessage", user, msg);
+        }
+
+        public Task SendIntAsync(string user, int msg)
+        {
+            return _sensorHub.InvokeAsync("SendInt", user, msg);
+        }
+
+        private void WriteMessages()
+        {
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
+            Console.WriteLine("--------------");
         }
     }
 }

@@ -7,27 +7,28 @@
 
 using System;
 using System.Threading;
+using JetBrains.Annotations;
 
 namespace PiControlApp.ConsoleUI
 {
+    [UsedImplicitly]
     public class Program
     {
+
         private static void Main(string[] args)
         {
+            string url = "http://192.168.1.138:5000/SensorHub";
+            int count = 1;
+
             Console.WriteLine("Hello World!");
+            Console.WriteLine("Blinking LED. Press Ctrl+C to end.");
 
             WeatherSensor sensor = new();
             GpioDevice led = new();
-            
-            //SignalRConnection signalRConnection = new SignalRConnection();
+            SignalRConnection signalRConnection = new(url);
 
-            //signalRConnection.Start();
-            //Thread.Sleep(100);
-            //signalRConnection.SendMessage("pi01", $"{DateTime.Now.Millisecond} initial startup");
-
-            Console.WriteLine("Blinking LED. Press Ctrl+C to end.");
-
-            int count = 1;
+            signalRConnection.SendMessageAsync("pi01", $"{DateTime.Now.Millisecond} initial startup");
+            signalRConnection.SendIntAsync("pi01-Counter", count);
 
             while (true)
             {
@@ -43,6 +44,15 @@ namespace PiControlApp.ConsoleUI
                 Console.WriteLine(sensor.ReadTemperature("c"));
                 count++;
                 Console.WriteLine($"number of samples {count}");
+
+                if (count % 8 is not 0)
+                {
+                    signalRConnection.SendMessageAsync("pi01", $"{count} count % 8 is not 0");
+                }
+                if (count % 2 is not 1)
+                {
+                    signalRConnection.SendIntAsync("pi01-Counter", count);
+                }
             }
         }
     }
