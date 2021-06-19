@@ -32,8 +32,7 @@ namespace PiControlApp.ConsoleUI
             Thread.Sleep(_measurementTime);
             _sensor.TryReadPressure(out var preValue);
 
-            string output = string.Empty;
-
+            string output;
             if (units == "inches")
             {
                 output = $"{preValue.InchesOfMercury} Inches";
@@ -61,8 +60,7 @@ namespace PiControlApp.ConsoleUI
             Thread.Sleep(_measurementTime);
             _sensor.TryReadAltitude(out var altValue);
 
-            string output = string.Empty;
-
+            string output;
             if (units == "feet")
             {
                 output = $"{altValue.Feet:#.##} Feet";
@@ -70,6 +68,25 @@ namespace PiControlApp.ConsoleUI
             else
             {
                 output = $"{altValue.Meters:#.##} Meters";
+            }
+
+            return output;
+        }
+
+        public string ReadTemperature(string units)
+        {
+            _sensor.SetPowerMode(Bmx280PowerMode.Forced);
+            Thread.Sleep(_measurementTime);
+            _sensor.TryReadTemperature(out var tempValue);
+
+            string output;
+            if (units == "f")
+            {
+                output = $"{tempValue.DegreesFahrenheit} F";
+            }
+            else
+            {
+                output = $"{tempValue.DegreesCelsius} C";
             }
 
             return output;
