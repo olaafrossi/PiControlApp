@@ -36,36 +36,15 @@ namespace PiControlApp.ConsoleUI
                 led.LedOn(true);
                 Thread.Sleep(1);
                 led.LedOn(false);
-                string pressureImperial = sensor.ReadPressure("inches");
-                string pressureMetric = sensor.ReadPressure("hecto");
-                string humidity = sensor.ReadHumidity();
-                string altitudeImperial = sensor.ReadAltitude("feet");
-                string altitudeMetric = sensor.ReadAltitude("meters");
-                string temperatureImperial = sensor.ReadTemperature("f");
-                string temperatureMetric = sensor.ReadTemperature("c");
 
-                // TODO create a new method in the WeatherSensor class to get all values
+                string weatherFreedom = sensor.GetAllReadings("i");
+                string weatherCommunist = sensor.GetAllReadings("c");
 
-                StringBuilder sb = new();
-                sb.Append(pressureImperial);
-                sb.AppendLine();
-                sb.Append(pressureMetric);
-                sb.AppendLine();
-                sb.Append(humidity);
-                sb.AppendLine();
-                sb.Append(altitudeImperial);
-                sb.AppendLine();
-                sb.Append(altitudeMetric);
-                sb.AppendLine();
-                sb.Append(temperatureImperial);
-                sb.AppendLine();
-                sb.Append(temperatureMetric);
-                sb.AppendLine();
-                sb.Append(DateTime.Now.ToString("hh:mm:ss.FFF"));
-                string message = sb.ToString();
+                Console.WriteLine($"Freedom Units {weatherFreedom} {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss:fffffff")}");
+                Console.WriteLine($"Communist Units {weatherCommunist}");
 
-                Console.WriteLine(message);
-                signalRConnection.SendMessageAsync("pi01-Data", message);
+                signalRConnection.SendMessageAsync("pi01-Data", weatherFreedom);
+                //signalRConnection.SendMessageAsync("pi01-Data", weatherCommunist);
 
                 count++;
                 Console.WriteLine($"number of samples {count}");

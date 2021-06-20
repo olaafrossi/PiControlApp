@@ -5,6 +5,7 @@
 
 using System;
 using System.Device.I2c;
+using System.Text;
 using System.Threading;
 using Iot.Device.Bmxx80;
 using Iot.Device.Bmxx80.PowerMode;
@@ -105,6 +106,45 @@ namespace PiControlApp.ConsoleUI
             else
             {
                 output = $"{tempValue.DegreesCelsius} C";
+            }
+
+            return output;
+        }
+
+        public string GetAllReadings(string units)
+        {
+            _sensor.SetPowerMode(Bmx280PowerMode.Forced);
+            Thread.Sleep(_measurementTime);
+            _sensor.TryReadTemperature(out var tempValue);
+            _sensor.TryReadAltitude(out var altValue);
+            _sensor.TryReadHumidity(out var humValue);
+            _sensor.TryReadPressure(out var preValue);
+            StringBuilder sb = new();
+            string output;
+            if (string.Equals(units, "i", StringComparison.OrdinalIgnoreCase))
+            {
+                
+                sb.Append($"{tempValue.DegreesFahrenheit} F");
+                sb.AppendLine();
+                sb.Append($"{altValue.Feet:#.##} Feet");
+                sb.AppendLine();
+                sb.Append($"{humValue.Percent:#.##} %Humidity");
+                sb.AppendLine();
+                sb.Append($"{preValue.InchesOfMercury} Inches");
+                sb.AppendLine();
+                output = sb.ToString();
+            }
+            else
+            {
+                sb.Append($"{tempValue.DegreesCelsius} C");
+                sb.AppendLine();
+                sb.Append($"{altValue.Meters:#.##} Meters");
+                sb.AppendLine();
+                sb.Append($"{humValue.Percent:#.##} %Humidity");
+                sb.AppendLine();
+                sb.Append($"{preValue.Hectopascals:#.##} Hectopascals");
+                sb.AppendLine();
+                output = sb.ToString();
             }
 
             return output;
