@@ -18,7 +18,7 @@ namespace PiControlApp.ConsoleUI
 
         private static void Main(string[] args)
         {
-            string url = "http://192.168.1.138:5000/SensorHub";
+            string url = "http://192.168.1.130:5000/SensorHub";
             int count = 1;
 
             Console.WriteLine("Hello World!");
