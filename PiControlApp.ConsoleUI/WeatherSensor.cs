@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using Iot.Device.Bmxx80;
 using Iot.Device.Bmxx80.PowerMode;
+using UnitsNet;
 
 namespace PiControlApp.ConsoleUI
 {
@@ -19,9 +20,9 @@ namespace PiControlApp.ConsoleUI
 
         public WeatherSensor()
         {
-            I2cConnectionSettings i2cSettings = new(1, Bmx280Base.DefaultI2cAddress);
-            I2cDevice i2cDevice = I2cDevice.Create(i2cSettings);
-            Bme280 sensor = new(i2cDevice);
+            I2cConnectionSettings i2CSettings = new(1, Bmx280Base.DefaultI2cAddress);
+            I2cDevice i2CDevice = I2cDevice.Create(i2CSettings);
+            Bme280 sensor = new(i2CDevice);
             int measurementTime = sensor.GetMeasurementDuration();
             Console.WriteLine($"Sensor Measurement time is {measurementTime} ms");
             Thread.Sleep(500);
@@ -39,7 +40,7 @@ namespace PiControlApp.ConsoleUI
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
             Thread.Sleep(_measurementTime);
-            _sensor.TryReadPressure(out var preValue);
+            _sensor.TryReadPressure(out Pressure preValue);
 
             string output;
             if (string.Equals(units, "inches", StringComparison.OrdinalIgnoreCase))
@@ -58,7 +59,7 @@ namespace PiControlApp.ConsoleUI
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
             Thread.Sleep(_measurementTime);
-            _sensor.TryReadHumidity(out var humValue);
+            _sensor.TryReadHumidity(out RelativeHumidity humValue);
             string output = $"{humValue.Percent:#.##} %Humidity";
             return output;
         }
@@ -72,7 +73,7 @@ namespace PiControlApp.ConsoleUI
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
             Thread.Sleep(_measurementTime);
-            _sensor.TryReadAltitude(out var altValue);
+            _sensor.TryReadAltitude(out Length altValue);
 
             string output;
             if (string.Equals(units, "feet", StringComparison.OrdinalIgnoreCase))
@@ -96,7 +97,7 @@ namespace PiControlApp.ConsoleUI
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
             Thread.Sleep(_measurementTime);
-            _sensor.TryReadTemperature(out var tempValue);
+            _sensor.TryReadTemperature(out Temperature tempValue);
 
             string output;
             if (string.Equals(units, "f", StringComparison.OrdinalIgnoreCase))
@@ -115,10 +116,10 @@ namespace PiControlApp.ConsoleUI
         {
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
             Thread.Sleep(_measurementTime);
-            _sensor.TryReadTemperature(out var tempValue);
-            _sensor.TryReadAltitude(out var altValue);
-            _sensor.TryReadHumidity(out var humValue);
-            _sensor.TryReadPressure(out var preValue);
+            _sensor.TryReadTemperature(out Temperature tempValue);
+            _sensor.TryReadAltitude(out Length altValue);
+            _sensor.TryReadHumidity(out RelativeHumidity humValue);
+            _sensor.TryReadPressure(out Pressure preValue);
             StringBuilder sb = new();
             string output;
             if (string.Equals(units, "i", StringComparison.OrdinalIgnoreCase))

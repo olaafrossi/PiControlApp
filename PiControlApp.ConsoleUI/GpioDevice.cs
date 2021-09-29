@@ -9,14 +9,14 @@ namespace PiControlApp.ConsoleUI
 {
     public class GpioDevice
     {
-        private const int pin = 18;
+        private const int Pin = 18;
         private readonly GpioController _controller;
 
         public GpioDevice()
         {
             GpioController controller = new();
             _controller = controller;
-            _controller.OpenPin(pin, PinMode.Output);
+            _controller.OpenPin(Pin, PinMode.Output);
         }
 
         /// <summary>
@@ -27,11 +27,11 @@ namespace PiControlApp.ConsoleUI
         {
             if (state is true)
             {
-                _controller.Write(pin, PinValue.High);
+                _controller.Write(Pin, PinValue.High);
             }
             else
             {
-                _controller.Write(pin, PinValue.Low);
+                _controller.Write(Pin, PinValue.Low);
             }
         }
     }
