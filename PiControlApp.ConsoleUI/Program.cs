@@ -1,5 +1,5 @@
 ﻿// Created: 2021|09|29
-// Modified: 2021|10|12
+// Modified: 2021|10|13
 // PiControlApp.ConsoleUI|Program.cs|PiControlApp
 // Olaaf Rossi
 
@@ -9,6 +9,9 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PiControlApp.ConsoleUI.DataAccess;
+using PiControlApp.ConsoleUI.Devices;
+using Refit;
 using Serilog;
 
 namespace PiControlApp.ConsoleUI
@@ -40,6 +43,9 @@ namespace PiControlApp.ConsoleUI
                     services.AddTransient<IMonitorService, MonitorService>();
                     services.AddSingleton<IWeatherSensor, WeatherSensor>();
                     services.AddSingleton<IGpioDevice, GpioDevice>();
+                    services.AddRefitClient<IWeatherData>().ConfigureHttpClient(c => 
+                        { c.BaseAddress = new Uri("https://192.168.1.72:8000"); }
+                    );
                 })
                 .UseSerilog()
                 .Build();

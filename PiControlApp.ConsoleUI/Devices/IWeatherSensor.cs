@@ -5,10 +5,14 @@
 
 using PiControlApp.ConsoleUI.Models;
 
-namespace PiControlApp.ConsoleUI
+namespace PiControlApp.ConsoleUI.Devices
 {
     public interface IWeatherSensor
     {
+        /// <summary>
+        ///     Gets all of the sensor readings in Imperial Units
+        /// </summary>
+        /// <returns></returns>
         WeatherReading GetAllReadingsImperial();
     }
 }

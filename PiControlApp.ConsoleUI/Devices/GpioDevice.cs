@@ -1,22 +1,26 @@
-﻿// Created: 2021|09|29
-// Modified: 2021|10|12
+﻿// Created: 2021|10|12
+// Modified: 2021|10|13
 // PiControlApp.ConsoleUI|GpioDevice.cs|PiControlApp
 // Olaaf Rossi
 
 using System.Device.Gpio;
+using Microsoft.Extensions.Logging;
 
-namespace PiControlApp.ConsoleUI
+namespace PiControlApp.ConsoleUI.Devices
 {
     public class GpioDevice : IGpioDevice
     {
         private const int Pin = 18;
         private readonly GpioController _controller;
+        private readonly ILogger<GpioDevice> _log;
 
-        public GpioDevice()
+        public GpioDevice(ILogger<GpioDevice> log)
         {
             GpioController controller = new();
             _controller = controller;
             _controller.OpenPin(Pin, PinMode.Output);
+            _log = log;
+            _log.LogInformation("GPIO Device has been created using pin # {Pin} in output mode", Pin);
         }
 
         /// <summary>
@@ -28,10 +32,12 @@ namespace PiControlApp.ConsoleUI
             if (state is true)
             {
                 _controller.Write(Pin, PinValue.High);
+                _log.LogInformation("Led On");
             }
             else
             {
                 _controller.Write(Pin, PinValue.Low);
+                _log.LogInformation("Led Off");
             }
         }
     }

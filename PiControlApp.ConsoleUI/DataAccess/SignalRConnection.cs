@@ -1,27 +1,31 @@
-﻿// Created by Three Byte Intermedia, Inc.
-// project: PiControlApp
-// Created: 2021 06 13
-// by Olaaf Rossi
+﻿// Created: 2021|10|13
+// Modified: 2021|10|13
+// PiControlApp.ConsoleUI|SignalRConnection.cs|PiControlApp
+// Olaaf Rossi
 
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 
-namespace PiControlApp.ConsoleUI
+namespace PiControlApp.ConsoleUI.DataAccess
 {
     public class SignalRConnection
     {
+        private readonly ILogger<SignalRConnection> _log;
         private readonly HubConnection _sensorHub;
 
-        public SignalRConnection(string url)
+        public SignalRConnection(string url, ILogger<SignalRConnection> log)
         {
             HubConnection connection = new HubConnectionBuilder()
                 .WithUrl(url)
                 .WithAutomaticReconnect()
                 .Build();
             _sensorHub = connection;
+            _log = log;
+            _log.LogInformation("SignalRConnection Constructed");
             Task task = ConnectWithRetryAsync(_sensorHub, CancellationToken.None);
         }
 
@@ -81,11 +85,13 @@ namespace PiControlApp.ConsoleUI
 
         public Task SendMessageAsync(string user, string msg)
         {
+            _log.LogInformation("Sent message {user} {msg}", user, msg);
             return _sensorHub.InvokeAsync("SendMessage", user, msg);
         }
 
         public Task SendIntAsync(string user, int msg)
         {
+            _log.LogInformation("Sent message {user} {msg}", user, msg);
             return _sensorHub.InvokeAsync("SendInt", user, msg);
         }
 

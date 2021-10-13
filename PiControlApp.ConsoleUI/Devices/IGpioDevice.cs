@@ -3,7 +3,7 @@
 // PiControlApp.ConsoleUI|IGpioDevice.cs|PiControlApp
 // Olaaf Rossi
 
-namespace PiControlApp.ConsoleUI
+namespace PiControlApp.ConsoleUI.Devices
 {
     public interface IGpioDevice
     {

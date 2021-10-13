@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "MA0007:Add a comma after the last value", Justification = "<Pending>", Scope = "member", Target = "~M:PiControlApp.ConsoleUI.WeatherSensor.GetAllReadingsImperial~PiControlApp.ConsoleUI.Models.WeatherReading")]
+[assembly: SuppressMessage("Style", "MA0007:Add a comma after the last value", Justification = "<Pending>", Scope = "member", Target = "~M:PiControlApp.ConsoleUI.Devices.WeatherSensor.GetAllReadingsImperial~PiControlApp.ConsoleUI.Models.WeatherReading")]

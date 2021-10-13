@@ -3,7 +3,6 @@
 // PiControlApp.ConsoleUI|WeatherSensor.cs|PiControlApp
 // Olaaf Rossi
 
-using System;
 using System.Device.I2c;
 using System.Diagnostics;
 using System.Threading;
@@ -14,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using PiControlApp.ConsoleUI.Models;
 using UnitsNet;
 
-namespace PiControlApp.ConsoleUI
+namespace PiControlApp.ConsoleUI.Devices
 {
     public class WeatherSensor : IWeatherSensor
     {
@@ -33,6 +32,10 @@ namespace PiControlApp.ConsoleUI
             _log.LogInformation("Created the Weather Sensor");
         }
 
+        /// <summary>
+        /// Gets all of the sensor readings in Imperial Units
+        /// </summary>
+        /// <returns></returns>
         public WeatherReading GetAllReadingsImperial()
         {
             string units = _config.GetValue<string>("Units");
