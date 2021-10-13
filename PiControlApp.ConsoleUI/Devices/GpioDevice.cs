@@ -1,13 +1,13 @@
-﻿// Created by Three Byte Intermedia, Inc.
-// project: PiControlApp
-// Created: 2021 06 19
-// by Olaaf Rossi
+﻿// Created: 2021|09|29
+// Modified: 2021|10|12
+// PiControlApp.ConsoleUI|GpioDevice.cs|PiControlApp
+// Olaaf Rossi
 
 using System.Device.Gpio;
 
 namespace PiControlApp.ConsoleUI
 {
-    public class GpioDevice
+    public class GpioDevice : IGpioDevice
     {
         private const int Pin = 18;
         private readonly GpioController _controller;
@@ -23,7 +23,7 @@ namespace PiControlApp.ConsoleUI
         ///     Turns on/off the LED connected to Pin 18
         /// </summary>
         /// <param name="state"></param>
-        public void LedOn(bool state)
+        public void LedState(bool state)
         {
             if (state is true)
             {

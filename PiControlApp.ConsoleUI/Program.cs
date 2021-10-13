@@ -1,11 +1,15 @@
 ﻿// Created: 2021|09|29
-// Modified: 2021|09|29
+// Modified: 2021|10|12
 // PiControlApp.ConsoleUI|Program.cs|PiControlApp
 // Olaaf Rossi
 
 using System;
-using System.Threading;
+using System.IO;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace PiControlApp.ConsoleUI
 {
@@ -19,56 +23,37 @@ namespace PiControlApp.ConsoleUI
 
         private static void Main(string[] args)
         {
-            string url = "http://192.168.1.130:5000/SensorHub";
-            int count = 1;
+            ConfigurationBuilder builder = new();
+            BuildConfig(builder);
 
-            Console.WriteLine("Hello World!");
-            //Console.WriteLine("Blinking LED. Press Ctrl+C to end.");
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Build())
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateLogger();
 
-            WeatherSensor sensor = new();
-            GpioDevice led = new();
-            //SignalRConnection signalRConnection = new(url);
+            Log.Logger.Information("Application Starting");
 
-            //signalRConnection.SendMessageAsync("pi01", $"{DateTime.Now.Millisecond} initial startup");
-            //signalRConnection.SendIntAsync("pi01-Counter", count);
+            IHost host = Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddTransient<IMonitorService, MonitorService>();
+                    services.AddSingleton<IWeatherSensor, WeatherSensor>();
+                    services.AddSingleton<IGpioDevice, GpioDevice>();
+                })
+                .UseSerilog()
+                .Build();
 
-            while (true)
-            {
-                //Console.WriteLine("Blinking LED True");
-                led.LedOn(true);
-                Thread.Sleep(200);
-                //Console.WriteLine("Blinking LED False");
-                led.LedOn(false);
-                Thread.Sleep(200);
+            IMonitorService svc = ActivatorUtilities.CreateInstance<MonitorService>(host.Services);
+            svc.Run();
+        }
 
-                string weatherFreedom = sensor.GetAllReadings("i");
-                string weatherCommunist = sensor.GetAllReadings("c");
-
-                //Console.WriteLine($"Freedom Units {weatherFreedom} {DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss:fffffff")}");
-                //Console.WriteLine($"Communist Units {weatherCommunist}");
-                Console.WriteLine(sensor.ReadPressure("inches"));
-                Console.WriteLine(sensor.ReadHumidity());
-                Console.WriteLine(sensor.ReadAltitude("feet"));
-                Console.WriteLine(sensor.ReadTemperature("f"));
-
-
-                //signalRConnection.SendMessageAsync("pi01-Data", weatherFreedom);
-                //signalRConnection.SendMessageAsync("pi01-Data", weatherCommunist);
-
-                count++;
-                Console.WriteLine($"number of samples {count}");
-                Thread.Sleep(1000);
-
-                //if (count % 2 is not 0)
-                //{
-                //    signalRConnection.SendMessageAsync("pi01", $"{count} count % 2 is not 0");
-                //}
-
-                //if (count % 2 is not 1)
-                //{
-                //    signalRConnection.SendIntAsync("pi01-Counter", count);
-                //}
-            }
+        private static void BuildConfig(IConfigurationBuilder builder)
+        {
+            builder.SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", false, true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIORNMENT") ?? "Production"}.json", true)
+                .AddEnvironmentVariables();
         }
     }
 }
