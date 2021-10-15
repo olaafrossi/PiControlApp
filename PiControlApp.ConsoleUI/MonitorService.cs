@@ -5,6 +5,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PiControlApp.ConsoleUI.DataAccess;
@@ -61,7 +62,7 @@ namespace PiControlApp.ConsoleUI
                     _log.LogError("Could not read from Weather Sensor");
                     _log.LogError("The count is {count}", count);
                 }
-
+                _log.LogInformation("Sleeping {weatherSensorReadInterval}", weatherSensorReadInterval);
                 Thread.Sleep(weatherSensorReadInterval);
             }
         }

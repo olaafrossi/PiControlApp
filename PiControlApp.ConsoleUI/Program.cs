@@ -44,7 +44,7 @@ namespace PiControlApp.ConsoleUI
                     services.AddSingleton<IWeatherSensor, WeatherSensor>();
                     services.AddSingleton<IGpioDevice, GpioDevice>();
                     services.AddRefitClient<IWeatherData>().ConfigureHttpClient(c => 
-                        { c.BaseAddress = new Uri("https://192.168.1.72:8000"); }
+                        { c.BaseAddress = new Uri("http://192.168.1.72:5233/api"); }
                     );
                 })
                 .UseSerilog()
