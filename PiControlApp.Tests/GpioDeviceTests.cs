@@ -1,12 +1,16 @@
-﻿using System;
-using PiControlApp.ConsoleUI.Devices;
-using Xunit;
+﻿// Created: 2021|10|21
+// Modified: 2021|10|27
+// PiControlApp.Tests|GpioDeviceTests.cs|PiControlApp
+// Olaaf Rossi
+
 using Moq;
 using Moq.Language.Flow;
+using PiControlApp.ConsoleUI.Devices;
+using Xunit;
 
 namespace PiControlApp.Tests
 {
-    public class GpioDeviceTests 
+    public class GpioDeviceTests
     {
         [Fact]
         public void LedState_ShouldBeNegative()
@@ -22,7 +26,6 @@ namespace PiControlApp.Tests
 
             // Assert
             Assert.Equal(expected, act);
-
         }
     }
 }

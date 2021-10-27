@@ -40,7 +40,6 @@ namespace PiControlApp.ConsoleUI
         public void Run()
         {
             _log.LogInformation("starting the run loop");
-
             _log.LogInformation("the units set are {_units} the deviceID is {_deviceId} the read interval is {_weatherSensorReadInterval}", _units, _deviceId, _weatherSensorReadInterval);
 
             while (RunLoop is true)

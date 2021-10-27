@@ -1,5 +1,5 @@
 ﻿// Created: 2021|09|29
-// Modified: 2021|10|13
+// Modified: 2021|10|27
 // PiControlApp.ConsoleUI|Program.cs|PiControlApp
 // Olaaf Rossi
 
@@ -25,11 +25,13 @@ namespace PiControlApp.ConsoleUI
     public class Program
     {
         private static IConfiguration _config;
+        private static string _weatherServerUrl;
 
         private static void Main(string[] args)
         {
             ConfigurationBuilder builder = new();
             BuildConfig(builder);
+            GetSettings(builder);
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Build())
@@ -39,15 +41,13 @@ namespace PiControlApp.ConsoleUI
 
             Log.Logger.Information("Application Starting");
 
-            string weatherServerUrl = _config.GetValue<string>("WeatherServerUrl");
 
             IHost host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
-                    //services.AddTransient<IMonitorService, MonitorService>();
                     services.AddSingleton<IWeatherSensor, WeatherSensor>();
                     services.AddSingleton<IGpioDevice, GpioDevice>();
-                    services.AddRefitClient<IWeatherData>().ConfigureHttpClient(c => { c.BaseAddress = new Uri(weatherServerUrl); });
+                    services.AddRefitClient<IWeatherData>().ConfigureHttpClient(c => { c.BaseAddress = new Uri(_weatherServerUrl); });
                 })
                 .UseSerilog()
                 .Build();
@@ -61,9 +61,15 @@ namespace PiControlApp.ConsoleUI
                 .AddJsonFile("appsettings.json", false, true)
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIORNMENT") ?? "Production"}.json", true)
                 .AddEnvironmentVariables();
+        }
 
+        private static void GetSettings(IConfigurationBuilder builder)
+        {
             IConfiguration config = builder.Build();
             _config = config;
+
+            string weatherServerUrl = _config.GetValue<string>("WeatherServerUrl");
+            _weatherServerUrl = weatherServerUrl;
         }
 
         private static void RunWeatherLoop(IHost host)

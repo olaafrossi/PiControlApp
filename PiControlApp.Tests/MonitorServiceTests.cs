@@ -1,9 +1,11 @@
-﻿using System;
-using PiControlApp.ConsoleUI.Devices;
-using Xunit;
+﻿// Created: 2021|10|23
+// Modified: 2021|10|27
+// PiControlApp.Tests|MonitorServiceTests.cs|PiControlApp
+// Olaaf Rossi
+
 using Moq;
-using Moq.Language.Flow;
 using PiControlApp.ConsoleUI;
+using Xunit;
 
 namespace PiControlApp.Tests
 {
@@ -19,7 +21,7 @@ namespace PiControlApp.Tests
 
             //Act
 
-            
+
             //service.Setup(i => i.IncrementFailedSensorCount(1)).;
 
             //var actual = service.Setup(mock => mock.IncrementFailedSensorCount(1));
@@ -28,7 +30,6 @@ namespace PiControlApp.Tests
 
             // Assert
             //Assert.Equal(expected, service);
-
         }
     }
 }
