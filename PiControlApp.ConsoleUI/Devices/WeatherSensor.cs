@@ -15,7 +15,7 @@ using UnitsNet;
 
 namespace PiControlApp.ConsoleUI.Devices
 {
-    public class WeatherSensor : IWeatherSensor
+    public class WeatherSensor
     {
         private readonly IConfiguration _config;
         private readonly ILogger<WeatherSensor> _log;
@@ -47,11 +47,8 @@ namespace PiControlApp.ConsoleUI.Devices
             _sensor.SetPowerMode(Bmx280PowerMode.Forced);
             Thread.Sleep(measurementTime);
             _sensor.TryReadTemperature(out Temperature tempValue);
-            Thread.Sleep(measurementTime);
             _sensor.TryReadAltitude(out Length altValue);
-            Thread.Sleep(measurementTime);
             _sensor.TryReadHumidity(out RelativeHumidity humValue);
-            Thread.Sleep(measurementTime);
             _sensor.TryReadPressure(out Pressure preValue);
 
             long time = timer.ElapsedMilliseconds;

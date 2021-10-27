@@ -6,7 +6,6 @@ using Moq.Language.Flow;
 
 namespace PiControlApp.Tests
 {
-
     public class GpioDeviceTests 
     {
         [Fact]

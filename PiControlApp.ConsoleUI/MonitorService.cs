@@ -1,18 +1,21 @@
 ﻿// Created: 2021|10|12
-// Modified: 2021|10|13
+// Modified: 2021|10|27
 // PiControlApp.ConsoleUI|MonitorService.cs|PiControlApp
 // Olaaf Rossi
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PiControlApp.ConsoleUI.DataAccess;
 using PiControlApp.ConsoleUI.Devices;
 using PiControlApp.ConsoleUI.Models;
 
+[assembly: InternalsVisibleTo("PiControlApp.Tests")]
+
 namespace PiControlApp.ConsoleUI
+
 {
     public class MonitorService : IMonitorService
     {
@@ -21,6 +24,10 @@ namespace PiControlApp.ConsoleUI
         private readonly ILogger<MonitorService> _log;
         private readonly IWeatherSensor _sensor;
         private readonly IWeatherData _server;
+        private string _deviceId;
+        private int _ledBlinkInterval;
+        private string _units;
+        private int _weatherSensorReadInterval;
 
         public MonitorService(ILogger<MonitorService> log, IConfiguration config, IWeatherSensor sensor, IGpioDevice led, IWeatherData server)
         {
@@ -29,43 +36,41 @@ namespace PiControlApp.ConsoleUI
             _sensor = sensor;
             _led = led;
             _server = server;
+            GetSettings();
         }
 
         public void Run()
         {
-            string units = _config.GetValue<string>("Units");
-            string deviceId = _config.GetValue<string>("DeviceID");
-            int weatherSensorReadInterval = _config.GetValue<int>("WeatherSensorReadInterval");
-            
             _log.LogInformation("starting the run loop");
-            _log.LogInformation("the units set are {units} the deviceID is {deviceID} the read interval is {weatherSensorReadInterval}", units, deviceId, weatherSensorReadInterval);
 
-            int count = 1;
+            _log.LogInformation("the units set are {_units} the deviceID is {_deviceId} the read interval is {_weatherSensorReadInterval}", _units, _deviceId, _weatherSensorReadInterval);
 
-            while (true)
+            while (RunLoop is true)
             {
                 LedBlink();
-                count++;
 
-                WeatherReading reading = _sensor.GetAllReadingsImperial();
+                WeatherReading reading = GetWeatherData();
 
                 if (reading is not null)
                 {
-                    _log.LogInformation("Reading from Sensor {count}", count);
-                    Console.WriteLine($"Pressure is {reading.Pressure} Humidity is {reading.Humidity} Altitude is {reading.Altitude} Temperature is {reading.Temperature} Units are {reading.Units}");
-
-                    // post to server
-                    _server.CreateWeatherReadingAsync(reading);
+                    SendWeatherData(reading);
+                    _log.LogInformation("Pressure is {reading.Pressure} Humidity is {reading.Humidity} Altitude is {reading.Altitude} Temperature is {reading.Temperature} Units are {reading.Units}", reading.Pressure, reading.Humidity, reading.Altitude, reading.Temperature, reading.Units);
                 }
                 else
                 {
+                    IncrementFailedSensorCount(1);
                     _log.LogError("Could not read from Weather Sensor");
-                    _log.LogError("The count is {count}", count);
+                    Console.WriteLine(FailedSensorReadCount);
                 }
-                _log.LogInformation("Sleeping {weatherSensorReadInterval}", weatherSensorReadInterval);
-                Thread.Sleep(weatherSensorReadInterval);
+
+                _log.LogInformation("Sleeping {_weatherSensorReadInterval}", _weatherSensorReadInterval);
+                Thread.Sleep(_weatherSensorReadInterval);
             }
         }
+
+        public int FailedSensorReadCount { get; private set; }
+
+        public bool RunLoop { get; set; }
 
         private void LedBlink()
         {
@@ -74,6 +79,45 @@ namespace PiControlApp.ConsoleUI
             Thread.Sleep(ledBlinkInterval);
             _led.LedState(false);
             Thread.Sleep(ledBlinkInterval);
+        }
+
+        private WeatherReading GetWeatherData()
+        {
+            WeatherReading output = new();
+            _sensor.ConnectToSensor();
+
+            if (_sensor.DeviceStatusOk is true)
+            {
+                output = _sensor.ReadFromSensor();
+            }
+            else if (_sensor.DeviceStatusOk is false)
+            {
+                _log.LogCritical("Device Status is { _sensor.DeviceStatusOk }", _sensor.DeviceStatusOk);
+            }
+
+            return output;
+        }
+
+        private void SendWeatherData(WeatherReading reading)
+        {
+            _server.CreateWeatherReadingAsync(reading);
+        }
+
+        public void IncrementFailedSensorCount(int i)
+        {
+            FailedSensorReadCount += i;
+        }
+
+        private void GetSettings()
+        {
+            string units = _config.GetValue<string>("Units");
+            string deviceId = _config.GetValue<string>("DeviceID");
+            int weatherSensorReadInterval = _config.GetValue<int>("WeatherSensorReadInterval");
+            int ledBlinkInterval = _config.GetValue<int>("LedBlinkInterval");
+            _units = units;
+            _deviceId = deviceId;
+            _weatherSensorReadInterval = weatherSensorReadInterval;
+            _ledBlinkInterval = ledBlinkInterval;
         }
     }
 }
