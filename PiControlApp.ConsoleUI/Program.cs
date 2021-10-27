@@ -41,7 +41,6 @@ namespace PiControlApp.ConsoleUI
 
             Log.Logger.Information("Application Starting");
 
-
             IHost host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
