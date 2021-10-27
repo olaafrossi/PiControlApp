@@ -3,7 +3,6 @@
 // PiControlApp.ConsoleUI|MonitorService.cs|PiControlApp
 // Olaaf Rossi
 
-using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +14,6 @@ using PiControlApp.ConsoleUI.Models;
 [assembly: InternalsVisibleTo("PiControlApp.Tests")]
 
 namespace PiControlApp.ConsoleUI
-
 {
     public class MonitorService : IMonitorService
     {
@@ -58,9 +56,7 @@ namespace PiControlApp.ConsoleUI
                 }
                 else
                 {
-                    IncrementFailedSensorCount(1);
                     _log.LogError("Could not read from Weather Sensor");
-                    Console.WriteLine(FailedSensorReadCount);
                 }
 
                 _log.LogInformation("Sleeping {_weatherSensorReadInterval}", _weatherSensorReadInterval);
@@ -74,11 +70,10 @@ namespace PiControlApp.ConsoleUI
 
         private void LedBlink()
         {
-            int ledBlinkInterval = _config.GetValue<int>("LedBlinkInterval");
             _led.LedState(true);
-            Thread.Sleep(ledBlinkInterval);
+            Thread.Sleep(_ledBlinkInterval);
             _led.LedState(false);
-            Thread.Sleep(ledBlinkInterval);
+            Thread.Sleep(_ledBlinkInterval);
         }
 
         private WeatherReading GetWeatherData()
@@ -89,10 +84,11 @@ namespace PiControlApp.ConsoleUI
             if (_sensor.SensorStatusOk is true)
             {
                 output = _sensor.ReadWeather();
+                DecrementFailedSensorCount();
             }
             else if (_sensor.SensorStatusOk is false)
             {
-                _log.LogCritical("Device Status is { _sensor.SensorStatusOk }", _sensor.SensorStatusOk);
+                IncrementFailedSensorCount();
             }
 
             return output;
@@ -103,9 +99,20 @@ namespace PiControlApp.ConsoleUI
             _server.CreateWeatherReadingAsync(reading);
         }
 
-        public void IncrementFailedSensorCount(int i)
+        private void IncrementFailedSensorCount()
         {
-            FailedSensorReadCount += i;
+            FailedSensorReadCount--;
+            _log.LogCritical("The number of Sensor Failed Reads is {FailedSensorReadCount}", FailedSensorReadCount);
+        }
+
+        private void DecrementFailedSensorCount()
+        {
+            if (FailedSensorReadCount <= -1)
+            {
+                FailedSensorReadCount = 0;
+            }
+
+            _log.LogInformation("The number of Sensor Failed Reads is {FailedSensorReadCount}", FailedSensorReadCount);
         }
 
         private void GetSettings()

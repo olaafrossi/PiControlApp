@@ -75,6 +75,7 @@ namespace PiControlApp.ConsoleUI.Devices
                 Units = _units
             };
 
+            Dispose();
             return output;
         }
 

@@ -71,11 +71,6 @@ namespace PiControlApp.ConsoleUI
             IMonitorService svc = ActivatorUtilities.CreateInstance<MonitorService>(host.Services);
             svc.RunLoop = true;
             svc.Run();
-
-            if (svc.FailedSensorReadCount >= 1000)
-            {
-                svc.RunLoop = false;
-            }
         }
     }
 }
