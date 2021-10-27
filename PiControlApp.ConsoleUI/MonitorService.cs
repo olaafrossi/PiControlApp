@@ -86,13 +86,13 @@ namespace PiControlApp.ConsoleUI
             WeatherReading output = new();
             _sensor.ConnectToSensor();
 
-            if (_sensor.DeviceStatusOk is true)
+            if (_sensor.SensorStatusOk is true)
             {
-                output = _sensor.ReadFromSensor();
+                output = _sensor.ReadWeather();
             }
-            else if (_sensor.DeviceStatusOk is false)
+            else if (_sensor.SensorStatusOk is false)
             {
-                _log.LogCritical("Device Status is { _sensor.DeviceStatusOk }", _sensor.DeviceStatusOk);
+                _log.LogCritical("Device Status is { _sensor.SensorStatusOk }", _sensor.SensorStatusOk);
             }
 
             return output;
