@@ -1,5 +1,5 @@
-﻿// Created: 2021|10|27
-// Modified: 2021|10|27
+﻿// Created: 2021|11|07
+// Modified: 2021|11|07
 // PiControlApp.ConsoleUI|IWeatherSensor.cs|PiControlApp
 // Olaaf Rossi
 
@@ -12,5 +12,6 @@ namespace PiControlApp.ConsoleUI.Devices
         void ConnectToSensor();
         WeatherReading ReadWeather();
         bool SensorStatusOk { get; }
+        void Dispose();
     }
 }

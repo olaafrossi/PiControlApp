@@ -1,8 +1,9 @@
 ﻿// Created: 2021|10|12
-// Modified: 2021|10|27
+// Modified: 2021|11|07
 // PiControlApp.ConsoleUI|MonitorService.cs|PiControlApp
 // Olaaf Rossi
 
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,8 @@ namespace PiControlApp.ConsoleUI
         private readonly ILogger<MonitorService> _log;
         private readonly IWeatherSensor _sensor;
         private readonly IWeatherData _server;
+
+        private WeatherReading _currentWeatherReading;
         private string _deviceId;
         private int _ledBlinkInterval;
         private string _units;
@@ -37,7 +40,7 @@ namespace PiControlApp.ConsoleUI
             GetSettings();
         }
 
-        public void Run()
+        public bool Run()
         {
             _log.LogInformation("starting the run loop");
             _log.LogInformation("the units set are {_units} the deviceID is {_deviceId} the read interval is {_weatherSensorReadInterval}", _units, _deviceId, _weatherSensorReadInterval);
@@ -46,12 +49,12 @@ namespace PiControlApp.ConsoleUI
             {
                 LedBlink();
 
-                WeatherReading reading = GetWeatherData();
+                CurrentWeatherReading = GetWeatherData();
 
-                if (reading is not null)
+                if (FailedSensorReadCount <= 3)
                 {
-                    SendWeatherData(reading);
-                    _log.LogInformation("Pressure is {reading.Pressure} Humidity is {reading.Humidity} Altitude is {reading.Altitude} Temperature is {reading.Temperature} Units are {reading.Units}", reading.Pressure, reading.Humidity, reading.Altitude, reading.Temperature, reading.Units);
+                    SendWeatherData(CurrentWeatherReading);
+                    _log.LogInformation("Pressure is {CurrentWeatherReading.Pressure} Humidity is {CurrentWeatherReading.Humidity} Altitude is {CurrentWeatherReading.Altitude} Temperature is {CurrentWeatherReading.Temperature} Units are {CurrentWeatherReading.Units}", CurrentWeatherReading.Pressure, CurrentWeatherReading.Humidity, CurrentWeatherReading.Altitude, CurrentWeatherReading.Temperature, CurrentWeatherReading.Units);
                 }
                 else
                 {
@@ -61,11 +64,29 @@ namespace PiControlApp.ConsoleUI
                 _log.LogInformation("Sleeping {_weatherSensorReadInterval}", _weatherSensorReadInterval);
                 Thread.Sleep(_weatherSensorReadInterval);
             }
+
+            return true;
         }
 
         public int FailedSensorReadCount { get; private set; }
 
         public bool RunLoop { get; set; }
+
+        public WeatherReading CurrentWeatherReading
+        {
+            get
+            {
+                if (FailedSensorReadCount >= -3)
+                {
+                    return _currentWeatherReading;
+                }
+
+                throw new Exception("No Sensor Read, killing");
+            }
+
+            set => _currentWeatherReading = value;
+        }
+
 
         private void LedBlink()
         {
@@ -83,11 +104,11 @@ namespace PiControlApp.ConsoleUI
             if (_sensor.SensorStatusOk is true)
             {
                 output = _sensor.ReadWeather();
-                DecrementFailedSensorCount();
+                SensorHasFailedToReadValues(false);
             }
             else if (_sensor.SensorStatusOk is false)
             {
-                IncrementFailedSensorCount();
+                SensorHasFailedToReadValues(true);
             }
 
             return output;
@@ -98,20 +119,20 @@ namespace PiControlApp.ConsoleUI
             _server.CreateWeatherReadingAsync(reading);
         }
 
-        private void IncrementFailedSensorCount()
+        private void SensorHasFailedToReadValues(bool sensorFailure)
         {
-            FailedSensorReadCount--;
-            _log.LogCritical("The number of Sensor Failed Reads is {FailedSensorReadCount}", FailedSensorReadCount);
-        }
-
-        private void DecrementFailedSensorCount()
-        {
-            if (FailedSensorReadCount <= -1)
+            if (sensorFailure is true)
             {
-                FailedSensorReadCount = 0;
+                FailedSensorReadCount--;
+                _log.LogCritical("The number of Sensor Failed Reads is {FailedSensorReadCount}", FailedSensorReadCount);
             }
-
-            _log.LogInformation("The number of Sensor Failed Reads is {FailedSensorReadCount}", FailedSensorReadCount);
+            else
+            {
+                while (FailedSensorReadCount <= -1)
+                {
+                    FailedSensorReadCount = 0;
+                }
+            }
         }
 
         private void GetSettings()

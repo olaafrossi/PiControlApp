@@ -75,7 +75,6 @@ namespace PiControlApp.ConsoleUI.Devices
                 Units = _units
             };
 
-            Dispose();
             return output;
         }
 
@@ -87,7 +86,7 @@ namespace PiControlApp.ConsoleUI.Devices
             _units = units;
         }
 
-        private void Dispose()
+        public void Dispose()
         {
             _sensor.Dispose();
         }

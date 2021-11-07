@@ -14,10 +14,14 @@ namespace PiControlApp.Tests
         [Fact]
         public void IncrementFailedSensorCount_ShouldIncrement()
         {
-            Mock<MonitorService> service = new();
+            var mock = new Mock<IMonitorService>();
+            mock.Setup(foo => foo.RunLoop).Returns(false);
+            mock.Setup(foo => foo.Run()).Returns(true);
+
+            //var instance = new MonitorService();
 
             // Arrange
-            int expected = 1;
+            //int expected = 0;
 
             //Act
 
