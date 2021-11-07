@@ -51,7 +51,7 @@ namespace PiControlApp.ConsoleUI
 
                 CurrentWeatherReading = GetWeatherData();
 
-                if (FailedSensorReadCount <= 3)
+                if (FailedSensorReadCount == 0)
                 {
                     SendWeatherData(CurrentWeatherReading);
                     _log.LogInformation("Pressure is {CurrentWeatherReading.Pressure} Humidity is {CurrentWeatherReading.Humidity} Altitude is {CurrentWeatherReading.Altitude} Temperature is {CurrentWeatherReading.Temperature} Units are {CurrentWeatherReading.Units}", CurrentWeatherReading.Pressure, CurrentWeatherReading.Humidity, CurrentWeatherReading.Altitude, CurrentWeatherReading.Temperature, CurrentWeatherReading.Units);
