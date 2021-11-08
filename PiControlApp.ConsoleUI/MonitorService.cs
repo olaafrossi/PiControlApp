@@ -1,5 +1,5 @@
 ﻿// Created: 2021|10|12
-// Modified: 2021|11|07
+// Modified: 2021|11|08
 // PiControlApp.ConsoleUI|MonitorService.cs|PiControlApp
 // Olaaf Rossi
 
@@ -49,10 +49,9 @@ namespace PiControlApp.ConsoleUI
             {
                 LedBlink();
 
-                CurrentWeatherReading = GetWeatherData();
-
-                if (FailedSensorReadCount == 0)
+                if (FailedSensorReadCount <= 0)
                 {
+                    CurrentWeatherReading = GetWeatherData();
                     SendWeatherData(CurrentWeatherReading);
                     _log.LogInformation("Pressure is {CurrentWeatherReading.Pressure} Humidity is {CurrentWeatherReading.Humidity} Altitude is {CurrentWeatherReading.Altitude} Temperature is {CurrentWeatherReading.Temperature} Units are {CurrentWeatherReading.Units}", CurrentWeatherReading.Pressure, CurrentWeatherReading.Humidity, CurrentWeatherReading.Altitude, CurrentWeatherReading.Temperature, CurrentWeatherReading.Units);
                 }
@@ -87,7 +86,6 @@ namespace PiControlApp.ConsoleUI
             set => _currentWeatherReading = value;
         }
 
-
         private void LedBlink()
         {
             _led.LedState(true);
@@ -104,11 +102,11 @@ namespace PiControlApp.ConsoleUI
             if (_sensor.SensorStatusOk is true)
             {
                 output = _sensor.ReadWeather();
-                SensorHasFailedToReadValues(false);
+                SensorHasSuccessfullyReadValues(true);
             }
             else if (_sensor.SensorStatusOk is false)
             {
-                SensorHasFailedToReadValues(true);
+                SensorHasSuccessfullyReadValues(false);
             }
 
             return output;
@@ -119,19 +117,19 @@ namespace PiControlApp.ConsoleUI
             _server.CreateWeatherReadingAsync(reading);
         }
 
-        private void SensorHasFailedToReadValues(bool sensorFailure)
+        private void SensorHasSuccessfullyReadValues(bool sensorReadOk)
         {
-            if (sensorFailure is true)
-            {
-                FailedSensorReadCount--;
-                _log.LogCritical("The number of Sensor Failed Reads is {FailedSensorReadCount}", FailedSensorReadCount);
-            }
-            else
+            if (sensorReadOk is true)
             {
                 while (FailedSensorReadCount <= -1)
                 {
                     FailedSensorReadCount = 0;
                 }
+            }
+            else
+            {
+                FailedSensorReadCount--;
+                _log.LogCritical("The number of Sensor Failed Reads is {FailedSensorReadCount}", FailedSensorReadCount);
             }
         }
 
