@@ -46,6 +46,7 @@ namespace PiControlApp.ConsoleUI
                 {
                     services.AddSingleton<IWeatherSensor, WeatherSensor>();
                     services.AddSingleton<IGpioDevice, GpioDevice>();
+                    services.AddSingleton<LightSensor>();
                     services.AddRefitClient<IWeatherData>().ConfigureHttpClient(c => { c.BaseAddress = new Uri(_weatherServerUrl); });
                 })
                 .UseSerilog()

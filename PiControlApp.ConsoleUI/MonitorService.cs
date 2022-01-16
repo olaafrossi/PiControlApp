@@ -23,6 +23,7 @@ namespace PiControlApp.ConsoleUI
         private readonly ILogger<MonitorService> _log;
         private readonly IWeatherSensor _sensor;
         private readonly IWeatherData _server;
+        private readonly LightSensor _light;
 
         private WeatherReading _currentWeatherReading;
         private string _deviceId;
@@ -30,13 +31,14 @@ namespace PiControlApp.ConsoleUI
         private string _units;
         private int _weatherSensorReadInterval;
 
-        public MonitorService(ILogger<MonitorService> log, IConfiguration config, IWeatherSensor sensor, IGpioDevice led, IWeatherData server)
+        public MonitorService(ILogger<MonitorService> log, IConfiguration config, IWeatherSensor sensor, IGpioDevice led, IWeatherData server, LightSensor light)
         {
             _log = log;
             _config = config;
             _sensor = sensor;
             _led = led;
             _server = server;
+            _light = light;
             GetSettings();
         }
 
@@ -48,6 +50,9 @@ namespace PiControlApp.ConsoleUI
             while (RunLoop is true)
             {
                 LedBlink();
+                int lightStatus = _light.LightReading();
+
+                _log.LogInformation("Light Reading is {lightStatus}", lightStatus);
 
                 if (FailedSensorReadCount <= 0)
                 {

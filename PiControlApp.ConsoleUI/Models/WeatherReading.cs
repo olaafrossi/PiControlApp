@@ -7,6 +7,7 @@ namespace PiControlApp.ConsoleUI.Models
 {
     public class WeatherReading
     {
+        public long Id { get; set; }
         public double Pressure { get; init; }
         public double Humidity { get; init; }
         public double Altitude { get; init; }

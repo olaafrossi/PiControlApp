@@ -11,7 +11,7 @@ namespace PiControlApp.ConsoleUI.DataAccess
 {
     public interface IWeatherData
     {
-        [Post("/Weather")]
+        [Post("/Totes")]
         Task CreateWeatherReadingAsync([Body] WeatherReading weather);
     }
 }

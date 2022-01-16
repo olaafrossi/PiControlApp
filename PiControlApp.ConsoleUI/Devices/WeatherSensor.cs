@@ -68,6 +68,7 @@ namespace PiControlApp.ConsoleUI.Devices
 
             WeatherReading output = new()
             {
+                Id = 1,
                 Pressure = preValue.InchesOfMercury,
                 Humidity = humValue.Percent,
                 Altitude = altValue.Feet,
